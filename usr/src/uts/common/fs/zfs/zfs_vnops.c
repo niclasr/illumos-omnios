@@ -1783,8 +1783,6 @@ top:
 		goto out;
 	}
 
-	vnevent_remove(vp, dvp, name, ct);
-
 	if (realnmp)
 		dnlc_remove(dvp, realnmp->pn_buf);
 	else
@@ -1865,6 +1863,8 @@ top:
 		dmu_tx_commit(tx);
 		goto out;
 	}
+	
+	vnevent_remove(vp, dvp, name, ct);
 
 	if (unlinked) {
 		/*
@@ -2190,8 +2190,6 @@ top:
 		goto out;
 	}
 
-	vnevent_rmdir(vp, dvp, name, ct);
-
 	/*
 	 * Grab a lock on the directory to make sure that noone is
 	 * trying to add (or lookup) entries while we are removing it.
@@ -2231,6 +2229,7 @@ top:
 	error = zfs_link_destroy(dl, zp, tx, zflg, NULL);
 
 	if (error == 0) {
+		vnevent_rmdir(vp, dvp, name, ct);
 		uint64_t txtype = TX_RMDIR;
 		if (flags & FIGNORECASE)
 			txtype |= TX_CI;
